@@ -1,50 +1,67 @@
 # Radical Pair Magnetoreception: Noise-Assisted Response Shelves
 
-This repository contains the Python implementation of the numerical experiments described in the paper **"Noise-Assisted Response Shelves and Angular Drift in Radical Pair Magnetoreception"**.
+This repository contains the Python implementation of the numerical experiments described in the paper **"Noise-Assisted Response Shelves and Angular Drift in Radical Pair Magnetoreception"** (Andrei Ursachi).
 
 The code simulates a minimal radical pair model with an axial hyperfine coupling on one electron, exploring the self-organization of magnetic-field sensitivity into discrete response shelves.
 
 ## Features
 
-- **Radical Pair Hamiltonian Construction**: Includes Zeeman interaction, axial Hyperfine coupling, and Exchange interaction.
-- **Liouvillian Dynamics**: Models coherent evolution, Haberkorn recombination (singlet/triplet), and environmental dephasing using the Lindblad pure-dephasing channel.
-- **Parallelized Integration**: Uses `scipy.linalg.expm` and `multiprocessing` to efficiently compute the time evolution of the 64-dimensional density matrix over large parameter grids.
+- **Radical Pair Hamiltonian Construction**: Includes Zeeman interaction, axial hyperfine coupling (S₁z·Iz), and isotropic exchange interaction (2J·S₁·S₂).
+- **Liouvillian Dynamics**: Models coherent evolution, Haberkorn recombination (singlet/triplet), and optional environmental dephasing using the Lindblad pure-dephasing channel.
+- **Efficient Integration**: Uses eigendecomposition of the 64×64 Liouvillian superoperator for analytic time integration of the singlet yield Y_S = k_S ∫₀^{t_max} Tr(Q_S ρ(t)) dt.
 - **Figure Generation**: Automatically computes and generates the key figures from the paper:
-  - `figure1.png`: The main response shelf across recombination asymmetry and magnetic fields.
-  - `figure2.png`: Collapse of normalized response curves demonstrating ratio-controlled locking.
-  - `figure3.png`: Power law scaling of shelf amplitude with hyperfine coupling strength.
-  - `figure4.png`: High-field angular drift and Zeeman-hyperfine interference transition.
+  - `figure1.png`: The main response shelf across recombination asymmetry u = log₁₀(k_S/k_T) and magnetic field B ∈ [30, 70] μT.
+  - `figure2.png`: Curve collapse analysis demonstrating approximate ratio-controlled locking across different (A, J) parameter combinations.
+  - `figure3.png`: Power law scaling of peak anisotropy ΔY_max with hyperfine coupling strength A (fixed J = 0.5 mT).
+  - `figure4.png`: High-field angular switching showing the Zeeman-hyperfine interference transition (θ_max vs B).
+
+## Model
+
+- **Hilbert space**: 8-dimensional (2 electron spins × 1 nuclear spin-½)
+- **Spins**: Two electrons (S₁, S₂) and one nucleus (I, spin-½ proton on radical 1)
+- **Initial state**: Singlet-projected state ρ(0) = |S⟩⟨S| ⊗ I₂/2
+- **Hamiltonian**: H = ω₀(cosθ·S_z^tot + sinθ·S_x^tot) + A·S₁z·Iz + 2J·S₁·S₂
+- **Recombination**: Haberkorn (−½k_S{Q_S,ρ} − ½k_T{Q_T,ρ})
+- **Dephasing**: Optional Lindblad channel on each electron (γ·D[S_iz])
+- **Integration time**: t_max = 10/k_T
+
+## Parameters
+
+| Parameter | Value |
+|-----------|-------|
+| k_T | 10⁶ s⁻¹ |
+| u = log₁₀(k_S/k_T) | 0 to 2.5 (50 points) |
+| θ | 0 to π (19 points) |
+| B (Figure 1) | 30–70 μT (9 points) |
+| A (Figure 3) | 0.5, 0.75, 1.0, 1.25, 1.5, 2.0 mT |
+| J (Figure 3) | 0.5 mT (fixed) |
+| B (Figure 4) | 0.3–3.0 mT (20 points) |
 
 ## Installation
-
-Install the required Python packages using:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-*(Note: Requires Python 3.8+)*
+Requires Python 3.8+ with NumPy, SciPy, and Matplotlib.
 
 ## Usage
-
-To run the experiments and generate the figures, simply execute:
 
 ```bash
 python main.py
 ```
 
-*Note: The computation performs high-resolution parameter scans (e.g., 50 points in recombination asymmetry, 19 points in angular orientation, multiple magnetic field strengths). The script leverages multiprocessing to speed up the density matrix exponentiation, but it may still take a few minutes to complete depending on your CPU.*
+Runtime is approximately 18 minutes on a single core. The computation involves eigendecomposition of 64×64 complex matrices across a parameter grid of ~9000 points.
 
 ## Outputs
 
-After running the script, the following files will be generated in the working directory:
-- `figure1.png`
-- `figure2.png`
-- `figure3.png`
-- `figure4.png`
+After running the script, the following files are generated:
+- `figure1.png` through `figure4.png`: Publication-quality figures
+- `data_figure1.csv`, `data_figure3.csv`, `data_figure4.csv`: Raw numerical data
 
-## Model Details
+## Key Results
 
-- **Spins**: Two electrons (S1, S2) and one nucleus (I, spin-1/2, representing a proton).
-- **Initial State**: Singlet-projected thermal state.
-- **Integration**: Computed via exact matrix exponentiation of the vectorized Liouvillian superoperator.
+- **Response shelf** (Figure 1): Anisotropy ΔY peaks near u* ≈ 1.7 across all B-field values, forming a shelf-like plateau in the (u, B) landscape.
+- **Curve collapse** (Figure 2): Normalized anisotropy curves show partial collapse across different (A, J) combinations (minimum pairwise r ≈ 0.42).
+- **Power law** (Figure 3): Peak anisotropy scales as ΔY_max ~ A^α with α ≈ 0.35 (R² = 0.92).
+- **Angular switching** (Figure 4): With hyperfine coupling, θ_max transitions from 0° (low B) to 90° (high B ≳ 1.8 mT). Without hyperfine, θ_max shows chaotic dependence on B.
