@@ -1,0 +1,21 @@
+=== Scaling Fit Statistics (Task 5) ===
+
+n = 12 data points
+A range: 0.2 – 3.0 mT
+
+--- Power Law: ΔY_max = c · A^α ---
+  α = 0.0018 ± 0.1522 (95% CI)
+  c = 4.2894e-01
+  R² = 0.853282
+  AIC = -193.09
+  BIC = -192.12
+
+--- Michaelis-Menten: ΔY_max = a·A/(b+A) ---
+  a = 3.3090e-03
+  b = 0.7326 mT (half-saturation)
+  R² = 0.942150
+  AIC = -204.25
+  BIC = -203.28
+
+Model comparison: ΔAIC = 11.17, ΔBIC = 11.17
+Preferred model (lower AIC): Michaelis-Menten
